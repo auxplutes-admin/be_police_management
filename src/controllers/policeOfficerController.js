@@ -7,7 +7,7 @@ import OfficerSession from '../models/officerSessionModel.js';
 
 export const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, sessionInfo } = req.body;
 
         // Get officer details
         const query = `
@@ -41,7 +41,11 @@ export const login = async (req, res) => {
 
         // Generate JWT token
         const token = jwt.sign(
-            { id: officer.officer_id, email: officer.officer_email },
+            { 
+                id: officer.officer_id, 
+                email: officer.officer_email,
+                role: officer.officer_designation
+            },
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
@@ -49,9 +53,12 @@ export const login = async (req, res) => {
         // Create session
         const session = await OfficerSession.create({
             officer_id: officer.officer_id,
-            username: officer.officer_email,
-            ip_address: req.ip,
-            device_info: req.headers['user-agent'],
+            officer_email: email,
+            ip_address: sessionInfo.ip_address,
+            device_info: sessionInfo.device_info,
+            latitude: sessionInfo.latitude,
+            longitude: sessionInfo.longitude,
+            session_metadata: sessionInfo,
             token: token,
             is_active: true
         });
@@ -229,13 +236,32 @@ export const getPoliceOfficerById = async (req, res) => {
 
 export const getAllPoliceOfficers = async (req, res) => {
     try {
-        const { station_id, page, limit } = req.query;
+        const { station_id, page, limit } = req.body;
         
         let query = `
             SELECT 
-                *
+                po.officer_id,
+                po.station_id,
+                po.officer_name,
+                po.officer_designation,
+                po.officer_badge_number,
+                po.officer_mobile_number,
+                po.officer_username,
+                po.officer_email,
+                po.officer_joining_date,
+                po.officer_status,
+                po.created_at,
+                po.updated_at,
+                po.created_by,
+                po.updated_by,
+                po.deleted_at,
+                po.deleted_by,
+                po.is_active,
+                po.is_deleted,
+                ps.station_name,
+                ps.station_address
             FROM police_officers po
-            LEFT JOIN police_station ps ON po.station_id = ps.station_id
+            LEFT JOIN police_stations ps ON po.station_id = ps.station_id
             WHERE po.is_deleted = false
         `;
 
@@ -394,6 +420,83 @@ export const deletePoliceOfficerById = async (req, res) => {
             status: "success",
             message: "Police officer deleted successfully",
             data: deletedOfficer
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            message: error.message
+        });
+    }
+};
+
+export const getOfficerSessionsByOfficerId = async (req, res) => {
+    try {
+        const { officer_id } = req.body;
+
+        // Get all sessions for the officer
+        const sessions = await OfficerSession.findAll({
+            where: {
+                officer_id: officer_id
+            },
+            order: [['login_time', 'DESC']]
+        });
+
+        if (!sessions || sessions.length === 0) {
+            return res.status(404).json({
+                status: "error",
+                message: "No sessions found for this officer"
+            });
+        }
+
+        res.status(200).json({
+            status: "success",
+            message: "Officer sessions retrieved successfully",
+            data: sessions
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            message: error.message
+        });
+    }
+};
+
+export const getOfficerByIdAndStation = async (req, res) => {
+    try {
+        const { officer_id, station_id } = req.body;
+
+        const query = `
+            SELECT 
+                po.*,
+                ps.station_name,
+                ps.station_address
+            FROM police_officers po
+            LEFT JOIN police_stations ps ON po.station_id = ps.station_id 
+            WHERE po.officer_id = $1
+            AND po.station_id = $2
+            AND po.is_deleted = false
+        `;
+
+        const [officer] = await db.query(query, {
+            bind: [officer_id, station_id],
+            type: QueryTypes.SELECT
+        });
+
+        if (!officer) {
+            return res.status(404).json({
+                status: "error",
+                message: "Police officer not found"
+            });
+        }
+
+        // Remove sensitive fields
+        delete officer.officer_password;
+
+        res.status(200).json({
+            status: "success",
+            data: officer
         });
 
     } catch (error) {

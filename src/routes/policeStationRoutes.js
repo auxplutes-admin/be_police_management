@@ -5,7 +5,7 @@ import { verifyToken } from "../middlewares/auth.js";
 const router = Router();
 
 router.post("/create", createPoliceStation);
-router.post("/get-by-id",verifyToken, getPoliceStationById);
+router.post("/get-station-by-id",verifyToken, getPoliceStationById);
 router.post("/update", verifyToken, updatePoliceStation);
 router.post("/delete", verifyToken, deletePoliceStationById);
 

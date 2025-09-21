@@ -27,7 +27,8 @@ const PoliceOfficer = sequelize.define("police_officers", {
         type: DataTypes.STRING(255)
     },
     officer_email: {
-        type: DataTypes.STRING(255)
+        type: DataTypes.STRING(255),
+        unique: true
     },
     officer_password: {
         type: DataTypes.STRING(255)

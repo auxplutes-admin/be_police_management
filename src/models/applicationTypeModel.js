@@ -1,8 +1,8 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/config.js";
 
-const CrimePart = sequelize.define("crime_parts", {
-    crime_part_id: {
+const ApplicationType = sequelize.define("application_types", {
+    application_type_id: {
         type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
@@ -11,7 +11,7 @@ const CrimePart = sequelize.define("crime_parts", {
         type: DataTypes.UUID,
         allowNull: false
     },
-    crime_part_name: {
+    application_type_name: {
         type: DataTypes.STRING(255)
     },
     created_at: {
@@ -44,8 +44,8 @@ const CrimePart = sequelize.define("crime_parts", {
         defaultValue: false
     }
 }, {
-    tableName: "crime_parts",
+    tableName: "application_types",
     timestamps: false,
 });
 
-export default CrimePart;
+export default ApplicationType;

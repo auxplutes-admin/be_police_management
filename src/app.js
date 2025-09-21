@@ -6,7 +6,9 @@ import sequelize from "./database/config.js";
 import crimeRoutes from "./routes/crimeRoutes.js";
 import policeOfficerRoutes from "./routes/policeOfficerRoutes.js";
 import policeStationRoutes from "./routes/policeStationRoutes.js";
-
+import applicationRoutes from "./routes/applicationRoutes.js";
+import applicationDataRuleRoutes from "./routes/applicationDataRuleRoutes.js";
+import crimeDataRuleRoutes from "./routes/crimeDataRuleRoutes.js";
 
 dotenv.config();
 
@@ -48,6 +50,9 @@ app.get("/health", (req, res) => {
 app.use("/api/v1/crimes", crimeRoutes);
 app.use("/api/v1/police-officers", policeOfficerRoutes);
 app.use("/api/v1/police-stations", policeStationRoutes);
+app.use("/api/v1/applications", applicationRoutes);
+app.use("/api/v1/application-data-rules", applicationDataRuleRoutes);
+app.use("/api/v1/crime-data-rules", crimeDataRuleRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

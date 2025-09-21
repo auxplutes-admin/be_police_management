@@ -7,6 +7,10 @@ const CrimeType = sequelize.define("crime_types", {
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
     },
+    station_id: {
+        type: DataTypes.UUID,
+        allowNull: false
+    },
     crime_type_name: {
         type: DataTypes.STRING(255)
     },

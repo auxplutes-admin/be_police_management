@@ -11,9 +11,9 @@ const OfficerSession = sequelize.define("officer_sessions", {
         type: DataTypes.UUID,
         allowNull: false
     },
-    username: {
+    officer_email: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     ip_address: {
         type: DataTypes.STRING,
@@ -23,12 +23,20 @@ const OfficerSession = sequelize.define("officer_sessions", {
         type: DataTypes.JSON,
         allowNull: true
     },
-    location: {
+    latitude: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
+    longitude: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
+    session_metadata: {
         type: DataTypes.JSON,
         allowNull: true
     },
     token: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     login_time: {
