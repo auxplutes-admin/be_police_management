@@ -1,4 +1,5 @@
 import sequelize from '../src/database/config.js';
+import bcryptjs from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 
 // Create station
@@ -58,12 +59,14 @@ const createStation = async () => {
       console.log('\x1b[32m%s\x1b[0m', '✓ Police station created successfully');
       console.log('\x1b[36m%s\x1b[0m', 'Creating police officer...');
       const officer_id = uuidv4();
+      const hashedPassword = await bcryptjs.hash('admin', 10);
       await sequelize.query(`
         INSERT INTO police_officers (
           officer_id,
           station_id, 
           officer_name, 
           officer_username,
+          officer_password,
           officer_designation, 
           officer_badge_number,
           officer_mobile_number, 
@@ -79,6 +82,7 @@ const createStation = async () => {
           '${stationId}', 
           'Admin User', 
           'admin',
+          '${hashedPassword}',
           'PI', 
           'MH_PL_2025_001',
           987654321, 
